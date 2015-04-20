@@ -36,7 +36,8 @@
 
       STA.hasher.start();
 
-      map = exports.KNIGHT.heatmap('#map', data);
+      //map = exports.KNIGHT.heatmap('#map', data);
+      map = exports.KNIGHT.heatmapSimple('#map', data);
       dataList = exports.KNIGHT.dataTable('#list', data);
 
       map.on('resize', function(){

@@ -7,8 +7,9 @@
     valueKey: 'rating',
     settings: {
       // radius should be small ONLY if scaleRadius is true (or small radius is intended)
-      "radius": 8,
+      "radius": 12,
       "maxOpacity": .8,
+      "minOpacity": 0,
       // scales the radius based on map zoom
       "scaleRadius": false,
       // if set to false the heatmap uses the global maximum for colorization
@@ -20,7 +21,11 @@
       // which field name in your data represents the longitude - default "lng"
       lngField: 'lng',
       // which field name in your data represents the data value - default "value"
-      valueField: 'count'
+      valueField: 'count',
+      gradient: {
+        '.5': 'red',
+        '.95': 'red'
+      }
     }
   };
 
@@ -67,27 +72,100 @@
     philadelphiaOutline();
 
     // config heatmap
-    var max = d3.max(data, function(d){
-      return d[heatmapConfig.valueKey];
-    });
-    var min = d3.min(data, function(d){
-      return d[heatmapConfig.valueKey];
+    setHeatMapDataToLayer(data, heatmapLayer, 1);
+
+
+    // set event handlers for map
+    map.on('moveend', function(){
+      var center = map.getCenter(),
+          zoom = map.getZoom();
+      var h = STA.hasher.get();
+
+      STA.hasher.setMapState(center, zoom);
     });
 
-    var heatmapData = [];
+    map.fire('moveend');
+
+    return map;
+  };
+
+  exports.KNIGHT.heatmapSimple = function(selector, data) {
+
+    // set height of map
+    d3.select(selector)
+      .style('height', window.innerHeight-150 + 'px');
+
+    // config layers
+    var baseLayer = L.tileLayer(mapConfig.baseLayer.template, mapConfig.baseLayer.options);
+    mapConfig.options.layers = [baseLayer];
+
+    // update map coordinates if present in hash
+    var hashCoords = STA.hasher.getMapState();
+    if (hashCoords) {
+      mapConfig.options.center = hashCoords.center;
+      mapConfig.options.zoom = hashCoords.zoom;
+    }
+
+    // create map
+    map = L.map('map', mapConfig.options);
+
+    // draw Philadelphia mask
+    philadelphiaOutline();
+
+    // config heatmap
+
+    var latlngsZero = [];
+    var latlngsOne = [];
+    var latlngsTwo = [];
+    var latlngsThree = [];
+    var latlngsFour = [];
 
     data.forEach(function(d){
-      heatmapData.push({
-        lat: d.location.coordinate.latitude,
-        lng: d.location.coordinate.longitude,
-        count: 1
-      });
+      if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.5) {
+        latlngsOne.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+      }else if(d[heatmapConfig.valueKey] >= 1.5 && d[heatmapConfig.valueKey] < 3) {
+        latlngsTwo.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+      }else if(d[heatmapConfig.valueKey] >= 3 && d[heatmapConfig.valueKey] < 4) {
+        latlngsThree.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+      }else if(d[heatmapConfig.valueKey] >= 4) {
+        latlngsFour.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+      }
+
     });
 
-    heatmapLayer.setData({
-      max: max,
-      min: min,
-      data: heatmapData
+
+    //setLatLngs
+    var heat = L.heatLayer(latlngsOne, {
+      key: 'one',
+      radius: 8,
+      minOpacity: 0.6,
+      blur: 8,
+      gradient: {0: '#ff0000', 0.65: '#ff0000', 1: '#ff0000'}
+    }).addTo(map);
+
+
+    heat.setLatLngs(latlngsTwo, {
+        key: 'two',
+        radius: 8,
+        blur: 8,
+        minOpacity: 0.6,
+        gradient: {0: '#ff7400', 0.65: '#ff7400', 1: '#ff7400'}
+    });
+
+    heat.setLatLngs(latlngsThree, {
+        key: 'three',
+        radius: 8,
+        blur: 8,
+        minOpacity: 0.6,
+        gradient: {0: '#009999', 0.65: '#009999', 1: '#009999'}
+    });
+
+    heat.setLatLngs(latlngsFour, {
+        key: 'four',
+        radius: 8,
+        blur: 8,
+        minOpacity: 0.6,
+        gradient: {0: '#00cc00', 0.65: '#00cc00', 1: '#00cc00'}
     });
 
     // set event handlers for map
@@ -103,6 +181,34 @@
 
     return map;
   };
+
+  function setHeatMapDataToLayer(data, layer, ratingNum) {
+    var max = d3.max(data, function(d){
+      return d[heatmapConfig.valueKey];
+    });
+    var min = d3.min(data, function(d){
+      return d[heatmapConfig.valueKey];
+    });
+
+    var heatmapData = [];
+
+    data.forEach(function(d){
+      if (d[heatmapConfig.valueKey] === ratingNum) {
+        heatmapData.push({
+          lat: d.location.coordinate.latitude,
+          lng: d.location.coordinate.longitude,
+          count: 1
+        });
+      }
+
+    });
+
+    layer.setData({
+      max: 1,
+      min: 1,
+      data: heatmapData
+    });
+  }
 
   var philadelphiaOutline = function() {
     d3.json('data/philadelphia.geojson', function(err, data){
