@@ -1,6 +1,7 @@
-* Quality of public services in Philadelphia based on Yelp
+# Knight Philadelphia
+Quality of public services in Philadelphia based on Yelp
 
-*** Running locally
+### Running locally
 In a shell, ie.: `Terminal.app`
 ```
 python -m SimpleHTTPServer 8000
