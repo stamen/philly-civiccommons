@@ -37,7 +37,12 @@
       STA.hasher.start();
 
       map = exports.KNIGHT.heatmap('#map', data);
-      dataList = exports.KNIGHT.dataTable(data);
+      dataList = exports.KNIGHT.dataTable('#list', data);
+
+      map.on('resize', function(){
+        dataList.resize(map.getSize());
+      });
+      map.fire('resize');
 
     });
   };

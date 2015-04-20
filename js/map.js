@@ -80,7 +80,7 @@
       heatmapData.push({
         lat: d.location.coordinate.latitude,
         lng: d.location.coordinate.longitude,
-        count: d.rating
+        count: 1
       });
     });
 
