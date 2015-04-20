@@ -1,4 +1,4 @@
-# Knight Philadelphia
+# Philadelphia Civic Commons
 Quality of public services in Philadelphia based on Yelp
 
 ### Running locally
