@@ -114,58 +114,53 @@
 
     // config heatmap
 
-    var latlngsZero = [];
-    var latlngsOne = [];
-    var latlngsTwo = [];
-    var latlngsThree = [];
-    var latlngsFour = [];
-
+    var lowRatings = [];
+    var avgRatings = [];
+    var highRatings = [];
+    var latlng
     data.forEach(function(d){
-      if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.5) {
-        latlngsOne.push([d.latitude, d.longitude]);
-      }else if(d[heatmapConfig.valueKey] >= 1.5 && d[heatmapConfig.valueKey] < 3) {
-        latlngsTwo.push([d.latitude, d.longitude]);
-      }else if(d[heatmapConfig.valueKey] >= 3 && d[heatmapConfig.valueKey] < 4) {
-        latlngsThree.push([d.latitude, d.longitude]);
-      }else if(d[heatmapConfig.valueKey] >= 4) {
-        latlngsFour.push([d.latitude, d.longitude]);
+      if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.75) {
+        latlng = new L.latLng([d.latitude, d.longitude]);
+        latlng.alt = d.rating;
+        lowRatings.push(latlng);
+      }else if(d[heatmapConfig.valueKey] >= 1.75 && d[heatmapConfig.valueKey] < 3.5) {
+        latlng = new L.latLng([d.latitude, d.longitude]);
+        latlng.alt = d.rating;
+        avgRatings.push(latlng);
+      }else if(d[heatmapConfig.valueKey] >= 3.5 ) {
+        latlng = new L.latLng([d.latitude, d.longitude]);
+        latlng.alt = d.rating;
+        highRatings.push(latlng);
       }
-
     });
 
-
-
-    var heat = L.heatLayer(latlngsOne, {
+    var heat = L.heatLayer(lowRatings, {
       key: 'one',
-      radius: 8,
-      minOpacity: 0.6,
-      blur: 1,
-      gradient: {0: '#ff0000', 0.65: '#ff0000', 1: '#ff0000'}
+      radius: 6,
+      minOpacity: 0.3,
+      maxOpacity: 0.85,
+      blur: 4,
+      gradient: {0: '#ff0000', 0.5: '#ff0000', 1: '#ff0000'}
     }).addTo(map);
 
 
-    heat.setLatLngs(latlngsTwo, {
+    heat.setLatLngs(avgRatings, {
         key: 'two',
-        radius: 8,
-        blur: 1,
-        minOpacity: 0.6,
-        gradient: {0: '#ff7400', 0.65: '#ff7400', 1: '#ff7400'}
+        radius: 6,
+        blur: 4,
+        minOpacity: 0.3,
+        maxOpacity: 0.85,
+        gradient: {0: '#00ffff', 0.5: '#00ffff', 1: '#00ffff'}
+
     });
 
-    heat.setLatLngs(latlngsThree, {
+    heat.setLatLngs(highRatings, {
         key: 'three',
-        radius: 8,
-        blur: 1,
-        minOpacity: 0.6,
-        gradient: {0: '#009999', 0.65: '#009999', 1: '#009999'}
-    });
-
-    heat.setLatLngs(latlngsFour, {
-        key: 'four',
-        radius: 8,
-        blur: 1,
-        minOpacity: 0.6,
-        gradient: {0: '#00cc00', 0.65: '#00cc00', 1: '#00cc00'}
+        radius: 6,
+        blur: 4,
+        minOpacity: 0.3,
+        maxOpacity: 0.85,
+        gradient: {0: '#aaff00', 0.5: '#aaff00', 1: '#aaff00'}
     });
 
 
@@ -214,8 +209,6 @@
   var philadelphiaOutline = function() {
     d3.json('data/philadelphia.geojson', function(err, data){
       if (err) return;
-
-      console.log(data);
 
       var outsideExtent = {
         's': 36,

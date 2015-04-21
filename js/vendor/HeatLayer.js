@@ -151,13 +151,14 @@ L.HeatLayer = (L.Layer ? L.Layer : L.Class).extend({
             i, len, p, cell, x, y, j, len2, k;
 
         var data;
-
         this._heat.clearCanvas();
 
         for (var ll in this._latlngs) {
             data = [];
 
             var latlngs = this._latlngs[ll].data;
+
+            var overlaps = 0;
             // console.time('process');
             for (i = 0, len = latlngs.length; i < len; i++) {
                 if (bounds.contains(latlngs[i])) {
@@ -168,6 +169,7 @@ L.HeatLayer = (L.Layer ? L.Layer : L.Class).extend({
                     var alt =
                         latlngs[i].alt !== undefined ? latlngs[i].alt :
                         latlngs[i][2] !== undefined ? +latlngs[i][2] : 1;
+                    v = 0.2;
                     k = alt * v;
 
                     grid[y] = grid[y] || [];
@@ -180,7 +182,9 @@ L.HeatLayer = (L.Layer ? L.Layer : L.Class).extend({
                         cell[0] = (cell[0] * cell[2] + p.x * k) / (cell[2] + k); // x
                         cell[1] = (cell[1] * cell[2] + p.y * k) / (cell[2] + k); // y
                         cell[2] += k; // cumulated intensity value
+                        overlaps++;
                     }
+
                 }
             }
 
@@ -202,10 +206,15 @@ L.HeatLayer = (L.Layer ? L.Layer : L.Class).extend({
 
             // console.time('draw ' + data.length);
             //this._heat.data(data).draw(this.options.minOpacity);
-
-            console.log(ll);
             var grad = this._latlngs[ll].options.gradient;
-            this._heat.drawWithData(data, grad, this._latlngs[ll].options.minOpacity);
+            var minOpacity = this._latlngs[ll].options.minOpacity || null;
+            var maxOpacity = this._latlngs[ll].options.maxOpacity || 1;
+
+            if (overlaps) {
+                //maxOpacity = maxOpacity/overlaps;
+            }
+
+            this._heat.drawWithData(data, grad, minOpacity, maxOpacity);
             //this._heat.createOverlay();
             // console.timeEnd('draw ' + data.length);
         }

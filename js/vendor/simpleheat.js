@@ -164,7 +164,7 @@ simpleheat.prototype = {
         return this;
     },
 
-    drawWithData: function (data, gradd, minOpacity) {
+    drawWithData: function (data, gradd, minOpacity, maxOpacity) {
         if (!this._circle) {
             this.radius(this.defaultRadius);
         }
@@ -174,11 +174,12 @@ simpleheat.prototype = {
         var ctx = this._ctx;
         ctx.clearRect(0, 0, this._width, this._height);
 
+        var max = d3.max(data, function(d){return d[2]});
         // draw a grayscale heatmap by putting a blurred circle at each data point
         for (var i = 0, len = data.length, p; i < len; i++) {
             p = data[i];
-
-            ctx.globalAlpha = Math.max(p[2] / this._max, minOpacity === undefined ? 0.05 : minOpacity);
+            ctx.globalAlpha = Math.max(p[2] / max, minOpacity === undefined ? 0.05 : minOpacity);
+            //ctx.globalAlpha = Math.min(maxOpacity, Math.max(1 / data.length, minOpacity === undefined ? 0.05 : minOpacity));
             ctx.drawImage(this._circle, p[0] - this._r, p[1] - this._r);
         }
 
@@ -187,21 +188,23 @@ simpleheat.prototype = {
         this._colorize(colored.data, grad);
         ctx.putImageData(colored, 0, 0);
         this.createOverlay();
-        //ctx.putImageData(this.mix(colored,tmp), 0, 0);
 
         return this;
     },
 
     blend: function() {
+
         var ctx = this._ctx;
         ctx.clearRect(0, 0, this._width, this._height);
-        var base = ctx.getImageData(0, 0, this._width, this._height);
+        //ctx.globalCompositeOperation = 'lighter';
+        var base = this.overlays.pop();//ctx.getImageData(0, 0, this._width, this._height);
         while(this.overlays.length) {
-            var o = this.overlays.shift();
+            var o = this.overlays.pop();
             base = this.mix(base, o);
         }
         ctx.putImageData(base, 0, 0);
     },
+
 
 
     _colorize: function (pixels, gradient) {
@@ -216,27 +219,13 @@ simpleheat.prototype = {
         }
     },
 
-    mixo: function () {
-        var ctx = this._ctx;
-        ctx.clearRect(0, 0, this._width, this._height);
-        var base = ctx.getImageData(0, 0, this._width, this._height);
-
-        var pixels = 4 * this._width * this._height;
-
-        var factor = 1/this.overlays.length;
-
-        while (pixels--) {
-            this.overlays.forEach(function(o){
-                base.data[pixels] = base.data[pixels] * factor + o.data[pixels] * factor;
-            });
-            //pixels1.data[pixels] = pixels1.data[pixels] * 0.5 + pixels2.data[pixels] * 0.5;
-        }
-        return base;
-    },
-
-
     mix: function(dest, source, blendMode) {
-        blendMode = 'screen';
+        blendMode = 'color';
+        //color
+        //overlay
+        //hardlight
+        //softlight
+        //lighten
 
         var dst = dest.data;
         var src = source.data;
