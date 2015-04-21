@@ -6,6 +6,11 @@ body {
   width: 100% !important;
   max-width: 1200px;
 }
+.headline {
+  font-size: 3rem;
+  margin: 0;
+  line-height: 5rem;
+}
 
 #map-wrapper {
   position: relative;

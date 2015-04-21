@@ -3,13 +3,24 @@
   var KNIGHT = exports.KNIGHT || (exports.KNIGHT = {});
 
   // available to all
-  KNIGHT.dispatch = d3.dispatch('filterChange');
+  KNIGHT.dispatch = d3.dispatch('filterChange', 'windowResize');
   d3.rebind(KNIGHT, KNIGHT.dispatch, 'on');
 
 
   function isValidLocation(item) {
     if (!isNaN(item.latitude) && !isNaN(item.longitude)) return true;
     return false;
+  }
+
+  function debounce(fn, delay) {
+    var timer = null;
+    return function () {
+      var context = this, args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        fn.apply(context, args);
+      }, delay);
+    };
   }
 
   var map, dataList;
@@ -68,14 +79,19 @@
       STA.hasher.start();
 
       //map = exports.KNIGHT.heatmap('#map', data);
-      map = exports.KNIGHT.heatmapSimple('#map', data);
-      dataList = exports.KNIGHT.dataTable('#list', data);
+      map = new exports.KNIGHT.heatmapSimple('#map', data);
+      dataList = new exports.KNIGHT.dataTable('#list', data);
 
       map.on('resize', function(){
+        console.log('map-resize');
         dataList.resize(map.getSize());
       });
       map.fire('resize');
 
+      d3.select(window).on('resize', debounce( onWindowResize, 400 ));
+      function onWindowResize(){
+        KNIGHT.dispatch.windowResize();
+      }
     });
   };
 

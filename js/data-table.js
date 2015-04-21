@@ -103,14 +103,14 @@
     filter.on('change', onFilterChange);
 
     function onFilterChange() {
-      var unchecked = checkboxes.filter(function(item){
-        return !this.checked;
+      var checked = checkboxes.filter(function(item){
+        return this.checked;
       });
-      unchecked = unchecked[0].map(function(item){
+      checked = checked[0].map(function(item){
         return item.getAttribute('data-key');
       });
 
-      KNIGHT.dispatch.filterChange(unchecked);
+      KNIGHT.dispatch.filterChange(checked);
     }
 
     d3.select('#cat-show-all').on('click', function(){
@@ -127,6 +127,12 @@
         this.checked = "";
       });
       onFilterChange();
+    });
+
+    onFilterChange();
+
+    KNIGHT.on('windowResize.table', function(){
+
     });
 
     return {

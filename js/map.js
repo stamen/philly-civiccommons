@@ -36,7 +36,8 @@
       maxZoom: 18,
       center: [ 39.96239, -75.125885],
       zoom: 11,
-      scrollWheelZoom: false
+      scrollWheelZoom: false,
+      trackResize: false
     },
     baseLayer: {
       template: 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
@@ -127,8 +128,14 @@
 
     map.fire('moveend');
 
-    KNIGHT.on('filterChange', function(filtered){
+    KNIGHT.on('filterChange.map', function(filtered){
       setHeatmapData(data,filtered);
+    });
+
+    KNIGHT.on('windowResize.map', function(){
+      d3.select(selector)
+        .style('height', window.innerHeight-150 + 'px');
+      map.invalidateSize();
     });
 
     return map;
@@ -143,14 +150,18 @@
   }
 
   function setHeatmapData(data,filtered) {
+    //filtered = ['churches'];
     var lowRatings = [];
     var avgRatings = [];
     var highRatings = [];
     var latlng;
 
     data = data.filter(function(d){
-      return !hasCategory(d.categoryKeys, filtered);
+      return hasCategory(d.categoryKeys, filtered);
     });
+
+    if (data.length < 5) console.log(data)
+
 
     data.forEach(function(d){
       if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.75) {
