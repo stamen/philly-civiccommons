@@ -12,6 +12,28 @@ body {
   line-height: 5rem;
 }
 
+.sort-cell {
+  cursor: pointer;
+}
+.sort-arrow {
+  width: 18px;
+  height: 18px;
+  display: none;
+  vertical-align: middle;
+}
+.active .sort-arrow{
+  display: inline-block;
+}
+
+[data-direction="ascending"] .sort-arrow {
+  background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M9 6l-4 4h8z"/></svg>') 0 0 no-repeat;
+}
+
+[data-direction="descending"] .sort-arrow {
+  background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path d="M5 8l4 4 4-4z"/></svg>') 0 0 no-repeat;
+}
+
+
 #map-wrapper {
   position: relative;
   overflow: hidden;
@@ -50,6 +72,7 @@ body {
   top: 0;
   right: 0;
   background: #fff;
+  background: rgba(255,255,255,0.6);
   padding: 20px;
   overflow: hidden;
 }
