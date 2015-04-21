@@ -79,6 +79,7 @@ body {
 
 .filter-wrapper {
   overflow: scroll;
+  overflow-x: hidden;
 }
 
 .filters {

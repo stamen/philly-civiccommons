@@ -88,6 +88,12 @@
       });
       map.fire('resize');
 
+      // IE 10 needs a little delay
+      setTimeout(function(){
+        dataList.triggerFilterChange();
+      }, 500);
+
+
       d3.select(window).on('resize', debounce( onWindowResize, 400 ));
       function onWindowResize(){
         KNIGHT.dispatch.windowResize();

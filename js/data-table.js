@@ -160,13 +160,14 @@
       onFilterChange();
     });
 
-    onFilterChange();
-
     KNIGHT.on('windowResize.table', function(){
 
     });
 
     return {
+      triggerFilterChange: function(){
+        onFilterChange();
+      },
       resize: function(size) {
 
         var parentHeight = size.y - 40;
