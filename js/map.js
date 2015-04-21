@@ -122,24 +122,24 @@
 
     data.forEach(function(d){
       if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.5) {
-        latlngsOne.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+        latlngsOne.push([d.latitude, d.longitude]);
       }else if(d[heatmapConfig.valueKey] >= 1.5 && d[heatmapConfig.valueKey] < 3) {
-        latlngsTwo.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+        latlngsTwo.push([d.latitude, d.longitude]);
       }else if(d[heatmapConfig.valueKey] >= 3 && d[heatmapConfig.valueKey] < 4) {
-        latlngsThree.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+        latlngsThree.push([d.latitude, d.longitude]);
       }else if(d[heatmapConfig.valueKey] >= 4) {
-        latlngsFour.push([d.location.coordinate.latitude, d.location.coordinate.longitude]);
+        latlngsFour.push([d.latitude, d.longitude]);
       }
 
     });
 
 
-    //setLatLngs
+
     var heat = L.heatLayer(latlngsOne, {
       key: 'one',
       radius: 8,
       minOpacity: 0.6,
-      blur: 8,
+      blur: 1,
       gradient: {0: '#ff0000', 0.65: '#ff0000', 1: '#ff0000'}
     }).addTo(map);
 
@@ -147,7 +147,7 @@
     heat.setLatLngs(latlngsTwo, {
         key: 'two',
         radius: 8,
-        blur: 8,
+        blur: 1,
         minOpacity: 0.6,
         gradient: {0: '#ff7400', 0.65: '#ff7400', 1: '#ff7400'}
     });
@@ -155,7 +155,7 @@
     heat.setLatLngs(latlngsThree, {
         key: 'three',
         radius: 8,
-        blur: 8,
+        blur: 1,
         minOpacity: 0.6,
         gradient: {0: '#009999', 0.65: '#009999', 1: '#009999'}
     });
@@ -163,10 +163,11 @@
     heat.setLatLngs(latlngsFour, {
         key: 'four',
         radius: 8,
-        blur: 8,
+        blur: 1,
         minOpacity: 0.6,
         gradient: {0: '#00cc00', 0.65: '#00cc00', 1: '#00cc00'}
     });
+
 
     // set event handlers for map
     map.on('moveend', function(){

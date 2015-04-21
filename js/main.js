@@ -4,17 +4,38 @@
 
 
   function isValidLocation(item) {
-    if (!item.location) return false;
-    if (!item.location.coordinate) return false;
-    if (!item.location.coordinate.latitude || !item.location.coordinate.longitude) return false;
-
-    return true;
+    if (!isNaN(item.latitude) && !isNaN(item.longitude)) return true;
+    return false;
   }
 
   var map, dataList;
 
   KNIGHT.init = function() {
-    d3.json('data/output.json', function(err,data){
+    d3.csv('data/output.csv', function(d){
+
+      var cats = d.categories.split('|');
+      if (cats.length < 1) {
+        cats = [['Unknown','unkwown']];
+      } else {
+        cats = cats.map(function(cat){
+          if (cat.length < 2) {
+            return ['Unknown','unkwown'];
+          }
+          return cat.split(';');
+        });
+      }
+
+      return {
+        name: d.name,
+        'review_count': +d.review_count,
+        rating: +d.rating,
+        latitude: +d.latitude,
+        longitude: +d.longitude,
+        categories: cats
+      };
+
+    },
+    function(err, data){
 
       data = data.filter(function(d){
         return isValidLocation(d);
