@@ -71,25 +71,39 @@
     var filterWrapper = filterParent.append('div')
       .attr('class', 'filter-wrapper');
 
-    filter = filterWrapper.append('ul')
+    var filter = filterWrapper.append('ul')
       .attr('class', 'filters');
 
     var filterItems = filter.selectAll('li')
       .data(categories)
         .enter().append('li')
-        .attr('data-key', function(d){
-          return d.key;
-        })
         .attr('class', 'filter');
 
-    filterItems.append("input")
-      .attr("checked", true)
-      .attr("type", "checkbox");
 
-    filterItems.append('label')
-        .text(function(d){
-          return d.label;
-        });
+    var label = filterItems.append('label');
+
+    label.append("input")
+      .attr("checked", true)
+      .attr("type", "checkbox")
+      .attr('data-key', function(d){
+          return d.key;
+        })
+
+    label.append('span').text(function(d){
+      return d.label;
+    });
+
+    var checkboxes = filter.selectAll('input[type="checkbox"]');
+    filter.on('change', function(){
+      var unchecked = checkboxes.filter(function(item){
+        return !this.checked;
+      });
+      unchecked = unchecked[0].map(function(item){
+        return item.getAttribute('data-key');
+      });
+
+      KNIGHT.dispatch.filterChange(unchecked);
+    });
 
     return {
       resize: function(size) {

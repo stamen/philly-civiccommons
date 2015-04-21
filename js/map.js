@@ -113,11 +113,45 @@
     philadelphiaOutline();
 
     // config heatmap
+    setHeatmapData(data,[]);
 
+    tooltips(data);
+    // set event handlers for map
+    map.on('moveend', function(){
+      var center = map.getCenter(),
+          zoom = map.getZoom();
+      var h = STA.hasher.get();
+
+      STA.hasher.setMapState(center, zoom);
+    });
+
+    map.fire('moveend');
+
+    KNIGHT.on('filterChange', function(filtered){
+      setHeatmapData(data,filtered);
+    });
+
+    return map;
+  };
+
+  function hasCategory(keys, filtered) {
+    var match = false;
+    filtered.forEach(function(k){
+      if (keys.indexOf(k) > -1) match = true;
+    });
+    return match;
+  }
+
+  function setHeatmapData(data,filtered) {
     var lowRatings = [];
     var avgRatings = [];
     var highRatings = [];
-    var latlng
+    var latlng;
+
+    data = data.filter(function(d){
+      return !hasCategory(d.categoryKeys, filtered);
+    });
+
     data.forEach(function(d){
       if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.75) {
         latlng = new L.latLng([d.latitude, d.longitude]);
@@ -134,17 +168,27 @@
       }
     });
 
-    var heat = L.heatLayer(lowRatings, {
-      key: 'one',
-      radius: 6,
-      minOpacity: 0.3,
-      maxOpacity: 0.85,
-      blur: 4,
-      gradient: {0: '#ff0000', 0.5: '#ff0000', 1: '#ff0000'}
-    }).addTo(map);
+    if (!heatmapLayer) {
+      heatmapLayer = L.heatLayer(lowRatings, {
+        key: 'one',
+        radius: 6,
+        minOpacity: 0.3,
+        maxOpacity: 0.85,
+        blur: 4,
+        gradient: {0: '#ff0000', 0.5: '#ff0000', 1: '#ff0000'}
+      }).addTo(map);
+    } else {
+       heatmapLayer.setLatLngs(lowRatings, {
+        key: 'one',
+        radius: 6,
+        minOpacity: 0.3,
+        maxOpacity: 0.85,
+        blur: 4,
+        gradient: {0: '#ff0000', 0.5: '#ff0000', 1: '#ff0000'}
+       });
+    }
 
-
-    heat.setLatLngs(avgRatings, {
+    heatmapLayer.setLatLngs(avgRatings, {
         key: 'two',
         radius: 6,
         blur: 4,
@@ -154,7 +198,7 @@
 
     });
 
-    heat.setLatLngs(highRatings, {
+   heatmapLayer.setLatLngs(highRatings, {
         key: 'three',
         radius: 6,
         blur: 4,
@@ -163,47 +207,6 @@
         gradient: {0: '#aaff00', 0.5: '#aaff00', 1: '#aaff00'}
     });
 
-    tooltips(data);
-    // set event handlers for map
-    map.on('moveend', function(){
-      var center = map.getCenter(),
-          zoom = map.getZoom();
-      var h = STA.hasher.get();
-
-      STA.hasher.setMapState(center, zoom);
-    });
-
-    map.fire('moveend');
-
-    return map;
-  };
-
-  function setHeatMapDataToLayer(data, layer, ratingNum) {
-    var max = d3.max(data, function(d){
-      return d[heatmapConfig.valueKey];
-    });
-    var min = d3.min(data, function(d){
-      return d[heatmapConfig.valueKey];
-    });
-
-    var heatmapData = [];
-
-    data.forEach(function(d){
-      if (d[heatmapConfig.valueKey] === ratingNum) {
-        heatmapData.push({
-          lat: d.location.coordinate.latitude,
-          lng: d.location.coordinate.longitude,
-          count: 1
-        });
-      }
-
-    });
-
-    layer.setData({
-      max: 1,
-      min: 1,
-      data: heatmapData
-    });
   }
 
   var tooltips = function(data) {

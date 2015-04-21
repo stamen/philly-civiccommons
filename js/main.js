@@ -2,6 +2,10 @@
 
   var KNIGHT = exports.KNIGHT || (exports.KNIGHT = {});
 
+  // available to all
+  KNIGHT.dispatch = d3.dispatch('filterChange');
+  d3.rebind(KNIGHT, KNIGHT.dispatch, 'on');
+
 
   function isValidLocation(item) {
     if (!isNaN(item.latitude) && !isNaN(item.longitude)) return true;
@@ -13,15 +17,20 @@
   KNIGHT.init = function() {
     d3.csv('data/output.csv', function(d){
 
+      var catkeys = [];
       var cats = d.categories.split('|');
       if (cats.length < 1) {
-        cats = [['Unknown','unkwown']];
+        cats = [['Unknown','unknown']];
+        catkeys.push('unknown');
       } else {
         cats = cats.map(function(cat){
           if (cat.length < 2) {
-            return ['Unknown','unkwown'];
+            catkeys.push('unknown');
+            return ['Unknown','unknown'];
           }
-          return cat.split(';');
+          var parts = cat.split(';');
+          catkeys.push(parts[1]);
+          return parts
         });
       }
 
@@ -31,7 +40,8 @@
         rating: +d.rating,
         latitude: +d.latitude,
         longitude: +d.longitude,
-        categories: cats
+        categories: cats,
+        categoryKeys: catkeys.join(' ')
       };
 
     },

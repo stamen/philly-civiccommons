@@ -17,7 +17,6 @@ body {
 }
 
 #category-filters {
-  display: none;
 }
 
 #category-filters h5 {
@@ -47,6 +46,21 @@ body {
   margin: 0;
   padding: 0;
   font-size: 12px;
+}
+
+.filter label {
+  margin-bottom: 5px;
+  line-height: 1;
+  font-weight: 400;
+  cursor: pointer;
+}
+.filter label:hover {
+  color: #666;
+}
+
+.filter input[type="checkbox"] {
+  margin-right: 5px;
+  margin-bottom: 0;
 }
 
 #map-key {
