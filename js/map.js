@@ -163,7 +163,7 @@
         gradient: {0: '#aaff00', 0.5: '#aaff00', 1: '#aaff00'}
     });
 
-
+    tooltips(data);
     // set event handlers for map
     map.on('moveend', function(){
       var center = map.getCenter(),
@@ -205,6 +205,17 @@
       data: heatmapData
     });
   }
+
+  var tooltips = function(data) {
+    var circle = L.divIcon({className: 'circle-6'});
+    data.forEach(function(d){
+
+      var m = L.marker( [d.latitude, d.longitude],{icon: circle}).addTo(map);
+
+      var content ="<b>" + d.name + "</b>: " + d.rating;
+      m.bindPopup(content);
+    });
+  };
 
   var philadelphiaOutline = function() {
     d3.json('data/philadelphia.geojson', function(err, data){

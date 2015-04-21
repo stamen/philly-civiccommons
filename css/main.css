@@ -58,7 +58,6 @@ body {
   background: rgba(255,255,255,0.7);
   padding: 10px 60px 0 0;
   border-top-right-radius: 10px;
-
 }
 #map-key > div {
   position: relative;
@@ -100,4 +99,11 @@ body {
 #map-key > div span:last-child {
   top: 100%;
   transform: translateY(-100%);
+}
+
+.circle-6 {
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: transparent;
 }
