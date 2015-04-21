@@ -78,7 +78,6 @@
 
       STA.hasher.start();
 
-      //map = exports.KNIGHT.heatmap('#map', data);
       map = new exports.KNIGHT.heatmapSimple('#map', data);
       dataList = new exports.KNIGHT.dataTable('#list', data);
 

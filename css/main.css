@@ -165,3 +165,7 @@ body {
   border-radius: 6px;
   background: transparent;
 }
+
+#list {
+  margin: 10px 15px;
+}
