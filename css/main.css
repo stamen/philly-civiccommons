@@ -20,8 +20,23 @@ body {
 }
 
 #category-filters h5 {
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.toggle-buttons {
+  margin:0 0 10px 0;
+  padding:0;
+  font-size: 12px;
+}
+.toggle-buttons span {
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.toggle-buttons span {
+  margin-right: 10px;
 }
 
 .panel {

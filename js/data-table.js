@@ -63,10 +63,16 @@
       });
     });
 
+    // sort categories
+    categories.sort(function(a,b){
+      if(a.label < b.label) return -1;
+      if(a.label > b.label) return 1;
+      return 0;
+    });
+
     var filterParent = d3.select('#category-filters');
 
-    var filterTitle = filterParent.append('h5')
-      .text('Categories');
+    var filterTitle = filterParent.select('.toggle-buttons');
 
     var filterWrapper = filterParent.append('div')
       .attr('class', 'filter-wrapper');
@@ -87,14 +93,16 @@
       .attr("type", "checkbox")
       .attr('data-key', function(d){
           return d.key;
-        })
+        });
 
     label.append('span').text(function(d){
       return d.label;
     });
 
     var checkboxes = filter.selectAll('input[type="checkbox"]');
-    filter.on('change', function(){
+    filter.on('change', onFilterChange);
+
+    function onFilterChange() {
       var unchecked = checkboxes.filter(function(item){
         return !this.checked;
       });
@@ -103,6 +111,22 @@
       });
 
       KNIGHT.dispatch.filterChange(unchecked);
+    }
+
+    d3.select('#cat-show-all').on('click', function(){
+      d3.event.preventDefault ? d3.event.preventDefault() : d3.event.returnValue = false;
+      checkboxes.each(function(){
+        this.checked = "checked";
+      });
+      onFilterChange();
+    });
+
+    d3.select('#cat-hide-all').on('click', function(){
+      d3.event.preventDefault ? d3.event.preventDefault() : d3.event.returnValue = false;
+      checkboxes.each(function(){
+        this.checked = "";
+      });
+      onFilterChange();
     });
 
     return {
