@@ -47,7 +47,7 @@
     }
   };
 
-  var map, heatmapLayer;
+  var map, heatmapLayer, markers, lastFiltered;
   exports.KNIGHT.heatmap = function(selector, data) {
 
     // set height of map
@@ -117,6 +117,7 @@
     setHeatmapData(data,[]);
 
     tooltips(data);
+
     // set event handlers for map
     map.on('moveend', function(){
       var center = map.getCenter(),
@@ -124,12 +125,16 @@
       var h = STA.hasher.get();
 
       STA.hasher.setMapState(center, zoom);
+
+      filterMarkers();
     });
 
     map.fire('moveend');
 
     KNIGHT.on('filterChange.map', function(filtered){
-      setHeatmapData(data,filtered);
+      lastFiltered = filtered;
+      setHeatmapData(data, filtered);
+      filterMarkers();
     });
 
     KNIGHT.on('windowResize.map', function(){
@@ -139,6 +144,25 @@
     });
 
     return map;
+  };
+
+  function filterMarkers() {
+    if (!markers || !lastFiltered) return;
+
+    var bds = map.getBounds();
+
+    markers.forEach(function(m){
+      if (hasCategory(m.categoryKeys, lastFiltered) && bds.contains(m.getLatLng())) {
+        if (m.disabled_) {
+          m.disabled_ = false;
+          m.addTo(map);
+        }
+      } else {
+        m.closePopup();
+        m.disabled_ = true;
+        map.removeLayer(m);
+      }
+    });
   };
 
   function hasCategory(keys, filtered) {
@@ -156,14 +180,12 @@
     var highRatings = [];
     var latlng;
 
-    data = data.filter(function(d){
+    var filteredData = data.filter(function(d){
       return hasCategory(d.categoryKeys, filtered);
     });
 
-    if (data.length < 5) console.log(data)
 
-
-    data.forEach(function(d){
+    filteredData.forEach(function(d){
       if(d[heatmapConfig.valueKey] >= 0 && d[heatmapConfig.valueKey] < 1.75) {
         latlng = new L.latLng([d.latitude, d.longitude]);
         latlng.alt = d.rating;
@@ -221,14 +243,17 @@
   }
 
   var tooltips = function(data) {
+    markers = [];
     var circle = L.divIcon({className: 'circle-6'});
     data.forEach(function(d){
-
       var m = L.marker( [d.latitude, d.longitude],{icon: circle}).addTo(map);
 
       var content ="<b>" + d.name + "</b>: " + d.rating;
       m.bindPopup(content);
+      m.categoryKeys = d.categoryKeys;
+      markers.push(m);
     });
+
   };
 
   var philadelphiaOutline = function() {
