@@ -26,7 +26,7 @@
   var map, dataList;
 
   KNIGHT.init = function() {
-    d3.csv('data/output.csv', function(d){
+    d3.csv('data/output_fourplusreviews.csv', function(d){
 
       var catkeys = [];
       var cats = d.categories.split('|');
